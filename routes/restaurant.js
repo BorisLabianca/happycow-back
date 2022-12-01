@@ -74,4 +74,16 @@ router.get("/shop/:id", async (req, res) => {
   }
 });
 
+router.get("/near", async (req, res) => {
+  try {
+    if (!req.query) {
+      return res.status(400).json({ message: error.message });
+    }
+    const shop = await Restaurant.findOne({ placeId: req.query.placeId });
+    res.status(200).json(shop);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
+
 module.exports = router;

@@ -11,9 +11,7 @@ const cloudinary = require("cloudinary").v2;
 const User = require("../models/User");
 
 // Fonction pour encoder les fichiers image
-const convertToBase64 = (file) => {
-  return `data:${file.mimetype};base64,${file.data.toString("base64")}`;
-};
+const convertToBase64 = require("../functions/convertTobase64");
 
 router.post("/user/signup", async (req, res) => {
   try {
@@ -22,7 +20,7 @@ router.post("/user/signup", async (req, res) => {
   }
 });
 
-router.post("/user/login", async (res, res) => {
+router.post("/user/login", async (req, res) => {
   try {
   } catch (error) {
     res.status(400).json({ message: error.message });

@@ -11,7 +11,7 @@ app.use(express.json());
 app.use(cors());
 
 // Paramètres Mongoose
-mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost:27017");
+mongoose.connect("mongodb://localhost:27017/happycow");
 
 // Paramètres de config Cloudinary
 cloudinary.config({
@@ -20,6 +20,12 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
   secure: true,
 });
+
+// Import des routes
+const restaurantRoutes = require("./routes/restaurant");
+const userRoutes = require("./routes/user");
+app.use(restaurantRoutes);
+app.use(userRoutes);
 
 app.all("*", (req, res) => {
   res.status(400).json({ message: "Cette page n'existe pas." });

@@ -10,6 +10,9 @@ const cloudinary = require("cloudinary").v2;
 // Import des modèles
 const User = require("../models/User");
 
+// Import des middlewares
+const isAuthenticated = require("../middleware/isAuthenticated");
+
 // Fonction pour encoder les fichiers image
 const convertToBase64 = require("../functions/convertTobase64");
 
@@ -75,6 +78,7 @@ router.post("/user/signup", async (req, res) => {
 router.post("/user/login", async (req, res) => {
   try {
     const { email, password } = req.body;
+    console.log(Object.keys(req));
 
     // Vérification de la présence des informations nécessaires
     if (!email || !password) {
@@ -99,6 +103,75 @@ router.post("/user/login", async (req, res) => {
       avatar: userExists.avatar,
       token: userExists.token,
     });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
+
+router.get("/user/profile/:id", isAuthenticated, async (req, res) => {
+  if (!req.params.id) {
+    return res.status(400).json({ message: "The user id is missing." });
+  }
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(400).json({ message: "User not found." });
+    }
+
+    res.json({
+      id: user._id,
+      username: user.username,
+      email: user.email,
+      location: user.location,
+      avatar: user.avatar,
+    });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
+
+router.put("/user/update", isAuthenticated, async (req, res) => {
+  try {
+    const userEmailAlreadyUsed = await User.findOne({ email: req.body.email });
+    const usernameAlreadyUsed = await User.findOne({
+      username: req.body.username,
+    });
+
+    if (usernameAlreadyUsed && req.user.username !== req.body.username) {
+      return res
+        .status(400)
+        .json({ message: "This username is already used." });
+    }
+    if (userEmailAlreadyUsed && req.user.email !== req.body.email) {
+      return res
+        .status(400)
+        .json({ message: "This email address is already used." });
+    }
+
+    if (req.body.username || req.body.email || req.body.location) {
+      const userToUpdate = await User.findById(req.user._id);
+
+      if (req.body.username !== userToUpdate.username) {
+        userToUpdate.username = req.body.username;
+      }
+      if (req.body.email !== userToUpdate.email) {
+        userToUpdate.email = req.body.email;
+      }
+      if (req.body.location !== userToUpdate.location) {
+        userToUpdate.location = req.body.location;
+      }
+      await userToUpdate.save();
+
+      res.status(200).json({
+        id: userToUpdate._id,
+        username: userToUpdate.username,
+        email: userToUpdate.email,
+        location: userToUpdate.location,
+        avatar: userToUpdate.avatar,
+      });
+    } else {
+      res.status(400).json({ message: "Missing informations." });
+    }
   } catch (error) {
     res.status(400).json({ message: error.message });
   }

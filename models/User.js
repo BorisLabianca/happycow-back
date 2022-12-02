@@ -5,8 +5,8 @@ const User = mongoose.model("User", {
   location: String,
   avatar: Object,
   token: String,
-  hash: String,
   salt: String,
+  hash: String,
 });
 
 module.exports = User;

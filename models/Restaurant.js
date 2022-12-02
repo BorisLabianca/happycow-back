@@ -21,6 +21,12 @@ const Restaurant = mongoose.model("Restaurant", {
   website: String,
   facebook: String,
   nearbyPlacesIds: Array,
+  owner: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+  ],
 });
 
 module.exports = Restaurant;

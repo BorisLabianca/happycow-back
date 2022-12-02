@@ -78,7 +78,7 @@ router.post("/user/signup", async (req, res) => {
 router.post("/user/login", async (req, res) => {
   try {
     const { email, password } = req.body;
-    console.log(Object.keys(req));
+    // console.log(Object.keys(req));
 
     // Vérification de la présence des informations nécessaires
     if (!email || !password) {
@@ -130,7 +130,7 @@ router.get("/user/profile/:id", isAuthenticated, async (req, res) => {
   }
 });
 
-router.put("/user/update", isAuthenticated, async (req, res) => {
+router.put("/user/update", isAuthenticated, fileUpload(), async (req, res) => {
   try {
     const userEmailAlreadyUsed = await User.findOne({ email: req.body.email });
     const usernameAlreadyUsed = await User.findOne({
@@ -148,18 +148,51 @@ router.put("/user/update", isAuthenticated, async (req, res) => {
         .json({ message: "This email address is already used." });
     }
 
-    if (req.body.username || req.body.email || req.body.location) {
+    if (
+      req.body.username ||
+      req.body.email ||
+      req.body.location ||
+      req?.files?.avatar
+    ) {
       const userToUpdate = await User.findById(req.user._id);
+      if (req.body.username) {
+        if (req.body.username !== userToUpdate.username) {
+          userToUpdate.username = req.body.username;
+        }
+      }
+      if (req.body.email) {
+        if (req.body.email !== userToUpdate.email) {
+          userToUpdate.email = req.body.email;
+        }
+      }
+      if (req.body.location) {
+        if (req.body.location !== userToUpdate.location) {
+          userToUpdate.location = req.body.location;
+        }
+      }
 
-      if (req.body.username !== userToUpdate.username) {
-        userToUpdate.username = req.body.username;
+      if (req.files?.avatar) {
+        if (!userToUpdate.avatar) {
+          const result = await cloudinary.uploader.upload(
+            convertToBase64(req.files.avatar),
+            {
+              folder: `/happycow/user/${userToUpdate._id}`,
+            }
+          );
+          userToUpdate.avatar = result;
+          // console.log(result);
+        } else {
+          await cloudinary.uploader.destroy(userToUpdate.avatar.public_id);
+          const result = await cloudinary.uploader.upload(
+            convertToBase64(req.files.avatar),
+            {
+              folder: `/happycow/user/${userToUpdate._id}`,
+            }
+          );
+          userToUpdate.avatar = result;
+        }
       }
-      if (req.body.email !== userToUpdate.email) {
-        userToUpdate.email = req.body.email;
-      }
-      if (req.body.location !== userToUpdate.location) {
-        userToUpdate.location = req.body.location;
-      }
+
       await userToUpdate.save();
 
       res.status(200).json({

@@ -67,8 +67,11 @@ router.post("/user/signup", async (req, res) => {
 
     res.status(200).json({
       _id: newUser._id,
+      username: newUser.username,
+      email: newUser.email,
+      location: newUser.location,
+      avatar: newUser.avatar.secure_url,
       token: token,
-      username: username,
     });
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -88,7 +91,7 @@ router.post("/user/login", async (req, res) => {
     // Vérification de l'existence de l'utilisateur
     const userExists = await User.findOne({ email: email });
     if (!userExists) {
-      return res.status(401).json({ message: "Unauthotized." });
+      return res.status(401).json({ message: "Unauthorized." });
     }
 
     // Vérification du hash
@@ -100,7 +103,9 @@ router.post("/user/login", async (req, res) => {
     res.status(200).json({
       _id: userExists._id,
       username: userExists.username,
-      avatar: userExists.avatar,
+      email: userExists.email,
+      location: userExists.location,
+      avatar: userExists.avatar.secure_url,
       token: userExists.token,
     });
   } catch (error) {
@@ -123,7 +128,7 @@ router.get("/user/profile/:id", isAuthenticated, async (req, res) => {
       username: user.username,
       email: user.email,
       location: user.location,
-      avatar: user.avatar,
+      avatar: user.avatar.secure_url,
     });
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -200,7 +205,7 @@ router.put("/user/update", isAuthenticated, fileUpload(), async (req, res) => {
         username: userToUpdate.username,
         email: userToUpdate.email,
         location: userToUpdate.location,
-        avatar: userToUpdate.avatar,
+        avatar: userToUpdate.avatar.secure_url,
       });
     } else {
       res.status(400).json({ message: "Missing informations." });

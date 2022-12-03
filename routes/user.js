@@ -70,7 +70,7 @@ router.post("/user/signup", async (req, res) => {
       username: newUser.username,
       email: newUser.email,
       location: newUser.location,
-      avatar: newUser.avatar.secure_url,
+      // avatar: newUser.avatar.secure_url,
       token: token,
     });
   } catch (error) {
@@ -99,13 +99,18 @@ router.post("/user/login", async (req, res) => {
     if (newHash !== userExists.hash) {
       return res.status(401).json({ message: "Unauthorized." });
     }
-
+    let avatar;
+    if (userExists.avatar) {
+      avatar = userExists.avatar.secure_url;
+    } else {
+      avatar = null;
+    }
     res.status(200).json({
       _id: userExists._id,
       username: userExists.username,
       email: userExists.email,
       location: userExists.location,
-      avatar: userExists.avatar.secure_url,
+      avatar: avatar,
       token: userExists.token,
     });
   } catch (error) {
@@ -122,13 +127,18 @@ router.get("/user/profile/:id", isAuthenticated, async (req, res) => {
     if (!user) {
       return res.status(400).json({ message: "User not found." });
     }
-
+    let avatar;
+    if (user.avatar) {
+      avatar = user.avatar.secure_url;
+    } else {
+      avatar = null;
+    }
     res.json({
       id: user._id,
       username: user.username,
       email: user.email,
       location: user.location,
-      avatar: user.avatar.secure_url,
+      avatar: avatar,
     });
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -199,13 +209,18 @@ router.put("/user/update", isAuthenticated, fileUpload(), async (req, res) => {
       }
 
       await userToUpdate.save();
-
+      let avatar;
+      if (userToUpdate.avatar) {
+        avatar = userToUpdate.avatar.secure_url;
+      } else {
+        avatar = null;
+      }
       res.status(200).json({
         id: userToUpdate._id,
         username: userToUpdate.username,
         email: userToUpdate.email,
         location: userToUpdate.location,
-        avatar: userToUpdate.avatar.secure_url,
+        avatar: avatar,
       });
     } else {
       res.status(400).json({ message: "Missing informations." });

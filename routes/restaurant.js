@@ -19,7 +19,7 @@ router.post("/add", async (req, res) => {
 
 router.get("/allshops", async (req, res) => {
   try {
-    // console.log(req.query);
+    console.log(req.query);
     let filters = {};
     if (req.query.name) {
       filters.name = new RegExp(req.query.name, "gi");
@@ -30,10 +30,12 @@ router.get("/allshops", async (req, res) => {
 
     let sort = {};
     if (req.query.sort) {
-      if (req.query.sort === "ABC") {
+      if (req.query.sort === "NameABC") {
         sort = { name: 1 };
-      } else if (req.query.sort === "CBA") {
+      } else if (req.query.sort === "NameCBA") {
         sort = { name: -1 };
+      } else if (req.query.sort === "RatingCBA") {
+        sort = { rating: -1 };
       }
     } else {
       sort = null;

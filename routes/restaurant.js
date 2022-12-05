@@ -55,6 +55,7 @@ router.get("/allshops", async (req, res) => {
 
     const allShops = await Restaurant.find(filters)
       .sort(sort)
+      .collation({ locale: "en", caseLevel: true, strength: 1 })
       .skip(skip)
       .limit(limit);
     const shopsCount = await Restaurant.countDocuments(filters);

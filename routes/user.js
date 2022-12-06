@@ -134,11 +134,12 @@ router.get("/user/profile/:id", isAuthenticated, async (req, res) => {
       avatar = null;
     }
     res.json({
-      id: user._id,
+      _id: user._id,
       username: user.username,
       email: user.email,
       location: user.location,
       avatar: avatar,
+      token: user.token,
     });
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -147,6 +148,7 @@ router.get("/user/profile/:id", isAuthenticated, async (req, res) => {
 
 router.put("/user/update", isAuthenticated, fileUpload(), async (req, res) => {
   try {
+    console.log(req.body);
     const userEmailAlreadyUsed = await User.findOne({ email: req.body.email });
     const usernameAlreadyUsed = await User.findOne({
       username: req.body.username,
@@ -216,11 +218,12 @@ router.put("/user/update", isAuthenticated, fileUpload(), async (req, res) => {
         avatar = null;
       }
       res.status(200).json({
-        id: userToUpdate._id,
+        _id: userToUpdate._id,
         username: userToUpdate.username,
         email: userToUpdate.email,
         location: userToUpdate.location,
         avatar: avatar,
+        token: userToUpdate.token,
       });
     } else {
       res.status(400).json({ message: "Missing informations." });

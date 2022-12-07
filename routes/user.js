@@ -9,6 +9,7 @@ const cloudinary = require("cloudinary").v2;
 
 // Import des modèles
 const User = require("../models/User");
+const Favorite = require("../models/Favorite");
 
 // Import des middlewares
 const isAuthenticated = require("../middleware/isAuthenticated");
@@ -118,6 +119,50 @@ router.post("/user/login", async (req, res) => {
   }
 });
 
+router.post("/user/addfavorite", isAuthenticated, async (req, res) => {
+  // console.log(req.body.placeId);
+  try {
+    const {
+      placeId,
+      name,
+      address,
+      location,
+      phone,
+      thumbnail,
+      type,
+      category,
+      rating,
+      vegan,
+      vegOnly,
+      price,
+      owner,
+    } = req.body;
+    const newFavorite = new Favorite({
+      placeId: placeId,
+      name: name,
+      address: address,
+      location: location,
+      phone: phone,
+      thumbnail: thumbnail,
+      type: type,
+      category: category,
+      rating: rating,
+      vegan: vegan,
+      vegOnly: vegOnly,
+      price: price,
+      owner: owner,
+    });
+    // console.log(newFavorite);
+    const user = await User.findById(owner);
+    user.favorites.push(newFavorite._id);
+    await newFavorite.save();
+    await user.save();
+    res.status(200).json({ newFavorite, user });
+  } catch (error) {
+    res.status(400).json({ error });
+  }
+});
+
 router.get("/user/profile/:id", isAuthenticated, async (req, res) => {
   if (!req.params.id) {
     return res.status(400).json({ message: "The user id is missing." });
@@ -141,6 +186,17 @@ router.get("/user/profile/:id", isAuthenticated, async (req, res) => {
       avatar: avatar,
       // token: user.token,
     });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
+
+router.get("/user/favorites", isAuthenticated, async (req, res) => {
+  try {
+    // console.log(req.user);
+    const favorites = await Favorite.find({ owner: req.user._id });
+    // console.log(favorites);
+    res.status(200).json(favorites);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }

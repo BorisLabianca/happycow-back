@@ -19,7 +19,7 @@ router.post("/add", async (req, res) => {
 
 router.get("/allshops", async (req, res) => {
   try {
-    console.log(req.query);
+    // console.log(req.query);
     let filters = {};
     if (req.query.name) {
       filters.name = new RegExp(req.query.name, "gi");

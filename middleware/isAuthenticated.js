@@ -2,6 +2,7 @@ const User = require("../models/User");
 
 const isAuthenticated = async (req, res, next) => {
   try {
+    // console.log(req.body);
     const isThereAToken = req.headers.authorization;
     if (!isThereAToken) {
       return res.status(401).json({ message: "Unauthorized." });

@@ -113,6 +113,8 @@ router.post("/user/login", async (req, res) => {
       location: userExists.location,
       avatar: avatar,
       token: userExists.token,
+      shops: userExists.shops,
+      favorites: userExists.favorites,
     });
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -157,9 +159,19 @@ router.post("/user/addfavorite", isAuthenticated, async (req, res) => {
     user.favorites.push(newFavorite._id);
     await newFavorite.save();
     await user.save();
-    res.status(200).json({ newFavorite, user });
+    const userData = {
+      _id: user._id,
+      username: user.username,
+      email: user.email,
+      location: user.location,
+      token: user.token,
+      shops: user.shops,
+      favorites: user.favorites,
+      avatar: user.avatar,
+    };
+    res.status(200).json({ newFavorite, userData });
   } catch (error) {
-    res.status(400).json({ error });
+    res.status(400).json({ message: error.message });
   }
 });
 
@@ -184,7 +196,9 @@ router.get("/user/profile/:id", isAuthenticated, async (req, res) => {
       email: user.email,
       location: user.location,
       avatar: avatar,
-      // token: user.token,
+      token: user.token,
+      shops: user.shops,
+      favorites: user.favorites,
     });
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -279,7 +293,9 @@ router.put("/user/update", isAuthenticated, fileUpload(), async (req, res) => {
         email: userToUpdate.email,
         location: userToUpdate.location,
         avatar: avatar,
-        // token: userToUpdate.token,
+        token: userToUpdate.token,
+        shops: userToUpdate.shops,
+        favorites: userToUpdate.favorites,
       });
     } else {
       res.status(400).json({ message: "Missing informations." });

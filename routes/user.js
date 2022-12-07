@@ -156,7 +156,7 @@ router.post("/user/addfavorite", isAuthenticated, async (req, res) => {
     });
     // console.log(newFavorite);
     const user = await User.findById(owner);
-    user.favorites.push(newFavorite._id);
+    user.favorites.push(newFavorite.placeId);
     await newFavorite.save();
     await user.save();
     const userData = {
@@ -167,7 +167,7 @@ router.post("/user/addfavorite", isAuthenticated, async (req, res) => {
       token: user.token,
       shops: user.shops,
       favorites: user.favorites,
-      avatar: user.avatar,
+      avatar: user.avatar.secure_url,
     };
     res.status(200).json({ newFavorite, userData });
   } catch (error) {
@@ -302,6 +302,33 @@ router.put("/user/update", isAuthenticated, fileUpload(), async (req, res) => {
     }
   } catch (error) {
     res.status(400).json({ message: error.message });
+  }
+});
+
+router.delete("/user/delete-favorite", isAuthenticated, async (req, res) => {
+  try {
+    console.log(req.body);
+    await Favorite.deleteOne({ placeId: req.body.placeId });
+    const userToDeleteFrom = await User.findById(req.body.userId);
+    const indexOfDeletion = userToDeleteFrom.favorites.indexOf(
+      req.body.placeId
+    );
+    userToDeleteFrom.favorites.splice(indexOfDeletion, 1);
+    console.log(userToDeleteFrom);
+
+    await userToDeleteFrom.save();
+    res.status(200).json({
+      _id: userToDeleteFrom._id,
+      username: userToDeleteFrom.username,
+      email: userToDeleteFrom.email,
+      location: userToDeleteFrom.location,
+      avatar: userToDeleteFrom.avatar.secure_url,
+      token: userToDeleteFrom.token,
+      shops: userToDeleteFrom.shops,
+      favorites: userToDeleteFrom.favorites,
+    });
+  } catch (error) {
+    res.status(400).json({ error });
   }
 });
 

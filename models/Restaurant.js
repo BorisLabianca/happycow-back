@@ -27,6 +27,12 @@ const Restaurant = mongoose.model("Restaurant", {
       ref: "User",
     },
   ],
+  reviews: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Review",
+    },
+  ],
 });
 
 module.exports = Restaurant;

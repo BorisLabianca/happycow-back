@@ -3,6 +3,7 @@ const User = mongoose.model("User", {
   username: String,
   email: String,
   location: String,
+  preferences: String,
   avatar: Object,
   token: String,
   salt: String,
@@ -17,6 +18,12 @@ const User = mongoose.model("User", {
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Favorite",
+    },
+  ],
+  reviews: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Review",
     },
   ],
 });

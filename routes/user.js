@@ -19,10 +19,10 @@ const convertToBase64 = require("../functions/convertTobase64");
 
 router.post("/user/signup", async (req, res) => {
   try {
-    const { username, email, location, password } = req.body;
+    const { username, email, location, preferences, password } = req.body;
 
     // Vérification de la présence des informations dans le body
-    if (!username || !email || !location || !password) {
+    if (!username || !email || !location || !preferences || !password) {
       return res.status(400).json({ message: "Missing parameters." });
     }
 
@@ -59,6 +59,7 @@ router.post("/user/signup", async (req, res) => {
       username: username,
       email: email,
       location: location,
+      preferences: preferences,
       token: token,
       salt: salt,
       hash: hash,
@@ -71,6 +72,7 @@ router.post("/user/signup", async (req, res) => {
       username: newUser.username,
       email: newUser.email,
       location: newUser.location,
+      preferences: newUser.preferences,
       // avatar: newUser.avatar.secure_url,
       token: token,
     });
@@ -111,6 +113,7 @@ router.post("/user/login", async (req, res) => {
       username: userExists.username,
       email: userExists.email,
       location: userExists.location,
+      preferences: userExists.preferences,
       avatar: avatar,
       token: userExists.token,
       shops: userExists.shops,
@@ -195,6 +198,7 @@ router.get("/user/profile/:id", isAuthenticated, async (req, res) => {
       username: user.username,
       email: user.email,
       location: user.location,
+      preferences: user.preferences,
       avatar: avatar,
       token: user.token,
       shops: user.shops,
@@ -226,12 +230,12 @@ router.put("/user/update", isAuthenticated, fileUpload(), async (req, res) => {
 
     if (usernameAlreadyUsed && req.user.username !== req.body.username) {
       return res
-        .status(400)
+        .status(409)
         .json({ message: "This username is already used." });
     }
     if (userEmailAlreadyUsed && req.user.email !== req.body.email) {
       return res
-        .status(400)
+        .status(409)
         .json({ message: "This email address is already used." });
     }
 
@@ -239,6 +243,7 @@ router.put("/user/update", isAuthenticated, fileUpload(), async (req, res) => {
       req.body.username ||
       req.body.email ||
       req.body.location ||
+      req.body.preferences ||
       req?.files?.avatar
     ) {
       const userToUpdate = await User.findById(req.user._id);
@@ -255,6 +260,11 @@ router.put("/user/update", isAuthenticated, fileUpload(), async (req, res) => {
       if (req.body.location) {
         if (req.body.location !== userToUpdate.location) {
           userToUpdate.location = req.body.location;
+        }
+      }
+      if (req.body.preferences) {
+        if (req.body.preferences !== userToUpdate.preferences) {
+          userToUpdate.preferences = req.body.preferences;
         }
       }
 
@@ -292,6 +302,7 @@ router.put("/user/update", isAuthenticated, fileUpload(), async (req, res) => {
         username: userToUpdate.username,
         email: userToUpdate.email,
         location: userToUpdate.location,
+        preferences: userToUpdate.preferences,
         avatar: avatar,
         token: userToUpdate.token,
         shops: userToUpdate.shops,
@@ -322,6 +333,7 @@ router.delete("/user/delete-favorite", isAuthenticated, async (req, res) => {
       username: userToDeleteFrom.username,
       email: userToDeleteFrom.email,
       location: userToDeleteFrom.location,
+      preferences: userToDeleteFrom.preferences,
       avatar: userToDeleteFrom.avatar.secure_url,
       token: userToDeleteFrom.token,
       shops: userToDeleteFrom.shops,

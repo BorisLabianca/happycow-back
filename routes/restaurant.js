@@ -47,10 +47,10 @@ router.get("/allshops", async (req, res) => {
     }
 
     let skip = 0;
-    if (!req.query.page) {
+    if (!req.query.skip) {
       skip = 0;
     } else {
-      skip = (Number(req.query.page) - 1) * limit;
+      skip = Number(req.query.skip);
     }
 
     const allShops = await Restaurant.find(filters)

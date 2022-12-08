@@ -150,7 +150,11 @@ router.get("/shop/:id", async (req, res) => {
       return res.status(400).json({ message: error.message });
     }
     const shop = await Restaurant.findById(req.params.id);
-    res.status(200).json(shop);
+    const reviews = await Review.find({ shop: req.params.id }).populate(
+      "owner"
+    );
+    console.log("reviews:", reviews);
+    res.status(200).json({ shop, reviews });
   } catch (error) {
     res.status(400).json({ message: error.message });
   }

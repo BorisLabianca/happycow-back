@@ -35,7 +35,7 @@ router.post(
       const reviewer = await User.findById(req.user._id).select(
         "-hash -salt -email -token"
       );
-      console.log(shopToReview);
+      // console.log(shopToReview);
       if (!title || !review || !rating || !placeId) {
         return res.status(400).json({ message: "Missing parameters." });
       }
@@ -153,7 +153,7 @@ router.get("/shop/:id", async (req, res) => {
     const reviews = await Review.find({ shop: req.params.id }).populate(
       "owner"
     );
-    console.log("reviews:", reviews);
+    // console.log("reviews:", reviews);
     res.status(200).json({ shop, reviews });
   } catch (error) {
     res.status(400).json({ message: error.message });

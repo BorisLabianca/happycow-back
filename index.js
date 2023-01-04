@@ -11,7 +11,7 @@ app.use(express.json());
 app.use(cors());
 
 // Paramètres Mongoose
-mongoose.connect("mongodb://localhost:27017/happycow");
+mongoose.connect(process.env.MONGODB_URI);
 
 // Paramètres de config Cloudinary
 cloudinary.config({

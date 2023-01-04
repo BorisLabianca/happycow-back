@@ -28,7 +28,7 @@ router.post(
   fileUpload(),
   async (req, res) => {
     try {
-      console.log(req.files.length);
+      // console.log(req.files.length);
       const { title, review, rating, pros, cons, placeId } = req.body;
       // console.log(req.files);
       const shopToReview = await Restaurant.findById(placeId);

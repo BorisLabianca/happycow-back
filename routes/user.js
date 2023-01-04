@@ -318,7 +318,7 @@ router.put("/user/update", isAuthenticated, fileUpload(), async (req, res) => {
 
 router.delete("/user/delete-favorite", isAuthenticated, async (req, res) => {
   try {
-    // console.log(req.body);
+    console.log(req.body);
     await Favorite.deleteOne({ placeId: req.body.placeId });
     const userToDeleteFrom = await User.findById(req.body.userId);
     const indexOfDeletion = userToDeleteFrom.favorites.indexOf(

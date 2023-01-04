@@ -321,24 +321,25 @@ router.delete("/user/delete-favorite", isAuthenticated, async (req, res) => {
     console.log(req.body);
     await Favorite.deleteOne({ placeId: req.body.placeId });
     const userToDeleteFrom = await User.findById(req.body.userId);
+
     const indexOfDeletion = userToDeleteFrom.favorites.indexOf(
       req.body.placeId
     );
     userToDeleteFrom.favorites.splice(indexOfDeletion, 1);
-    // console.log(userToDeleteFrom);
+    console.log(userToDeleteFrom);
 
     await userToDeleteFrom.save();
-    res.status(200).json({
-      _id: userToDeleteFrom._id,
-      username: userToDeleteFrom.username,
-      email: userToDeleteFrom.email,
-      location: userToDeleteFrom.location,
-      preferences: userToDeleteFrom.preferences,
-      avatar: userToDeleteFrom.avatar.secure_url,
-      token: userToDeleteFrom.token,
-      shops: userToDeleteFrom.shops,
-      favorites: userToDeleteFrom.favorites,
-    });
+    // res.status(200).json({
+    //   _id: userToDeleteFrom._id,
+    //   username: userToDeleteFrom.username,
+    //   email: userToDeleteFrom.email,
+    //   location: userToDeleteFrom.location,
+    //   preferences: userToDeleteFrom.preferences,
+    //   avatar: userToDeleteFrom.avatar.secure_url,
+    //   token: userToDeleteFrom.token,
+    //   shops: userToDeleteFrom.shops,
+    //   favorites: userToDeleteFrom.favorites,
+    // });
   } catch (error) {
     res.status(400).json({ error });
   }

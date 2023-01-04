@@ -35,7 +35,7 @@ router.post(
       const reviewer = await User.findById(req.user._id).select(
         "-hash -salt -email -token"
       );
-      // console.log(shopToReview);
+      // console.log(reviewer);
       if (!title || !review || !rating || !placeId) {
         return res.status(400).json({ message: "Missing parameters." });
       }
@@ -83,8 +83,17 @@ router.post(
         newReview.photos = arrayOfPhotosUrl;
         // console.log(arrayOfPhotosUrl);
       }
+      const newDate = new Date();
+      const options = { month: "short" };
+      const reviewDate = `${newDate.getDate()} ${Intl.DateTimeFormat(
+        "fr-FR",
+        options
+      ).format(newDate)} ${newDate.getFullYear()}`;
+
+      // console.log(shopToReview);
       reviewer.reviews.push(newReview);
       shopToReview.reviews.push(newReview);
+      newReview.date = reviewDate;
       await newReview.save();
       await reviewer.save();
       await shopToReview.save();

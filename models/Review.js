@@ -3,6 +3,7 @@ const Review = mongoose.model("Review", {
   title: String,
   review: String,
   rating: Number,
+  date: String,
   pros: String,
   cons: String,
   photos: Array,

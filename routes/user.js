@@ -170,7 +170,7 @@ router.post("/user/addfavorite", isAuthenticated, async (req, res) => {
       token: user.token,
       shops: user.shops,
       favorites: user.favorites,
-      avatar: user.avatar.secure_url,
+      avatar: user?.avatar.secure_url ? user.avatar.secure_url : null,
     };
     res.status(200).json({ newFavorite, userData });
   } catch (error) {

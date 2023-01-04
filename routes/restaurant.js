@@ -28,7 +28,7 @@ router.post(
   fileUpload(),
   async (req, res) => {
     try {
-      // console.log(req.files);
+      console.log(req.files.length);
       const { title, review, rating, pros, cons, placeId } = req.body;
       // console.log(req.files);
       const shopToReview = await Restaurant.findById(placeId);
@@ -54,9 +54,9 @@ router.post(
       if (cons) {
         newReview.cons = cons;
       }
-      if (req?.files?.photos && req?.files?.photos.length !== 0) {
+      if (req?.files?.photos) {
         const arrayOfPhotosUrl = [];
-        if (req.files.photos.length === 1) {
+        if (req.files.photos.length === undefined) {
           let result = await cloudinary.uploader.upload(
             convertToBase64(req.files.photos),
             {

@@ -335,7 +335,9 @@ router.delete("/user/delete-favorite", isAuthenticated, async (req, res) => {
       email: userToDeleteFrom.email,
       location: userToDeleteFrom.location,
       preferences: userToDeleteFrom.preferences,
-      avatar: userToDeleteFrom.avatar.secure_url,
+      avatar: userToDeleteFrom.avatar
+        ? userToDeleteFrom.avatar.secure_url
+        : null,
       token: userToDeleteFrom.token,
       shops: userToDeleteFrom.shops,
       favorites: userToDeleteFrom.favorites,

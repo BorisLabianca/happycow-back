@@ -341,7 +341,7 @@ router.delete("/user/delete-favorite", isAuthenticated, async (req, res) => {
       favorites: userToDeleteFrom.favorites,
     });
   } catch (error) {
-    res.status(400).json({ error });
+    res.status(400).json({ message: error.message });
   }
 });
 

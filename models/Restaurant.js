@@ -1,11 +1,11 @@
 const mongoose = require("mongoose");
 const Restaurant = mongoose.model("Restaurant", {
-  placeId: Number,
+  placeId: String,
   name: String,
   address: String,
   location: {
-    lng: Number,
-    lat: Number,
+    type: Object, // Longitude et latitude
+    index: "2d",
   },
   phone: String,
   thumbnail: String,

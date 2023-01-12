@@ -15,8 +15,123 @@ const isAuthenticated = require("../middleware/isAuthenticated");
 // Fonction pour encoder les fichiers image
 const convertToBase64 = require("../functions/convertTobase64");
 
-router.post("/add", async (req, res) => {
+router.post("/add", isAuthenticated, fileUpload(), async (req, res) => {
   try {
+    const {
+      name,
+      address,
+      lng,
+      lat,
+      phone,
+      type,
+      category,
+      rating,
+      description,
+      price,
+      website,
+      facebook,
+    } = req.body;
+
+    // Vérification de la présence des informations dans le body
+    // console.log(req.body.lat);
+    // console.log(req.user);
+    if (
+      !name ||
+      !address ||
+      !lng ||
+      !lat ||
+      !phone ||
+      !type ||
+      !category ||
+      !rating ||
+      !description ||
+      !price
+    ) {
+      return res.status(400).json({ message: "Missing parameters." });
+    }
+
+    // Vérification de l'existence du restaurant dans la base de données
+    const shopExists = await Restaurant.findOne({ name: name });
+    if (shopExists) {
+      return res
+        .status(409)
+        .json({ message: "This place has already been added." });
+    }
+    // const parsedLocation = JSON.parse(location);
+    // console.log(parsedLocation);
+    const nearbyPlaces = await Restaurant.find({
+      location: {
+        $near: [Number(lng), Number(lat)],
+        $maxDistance: 0.003,
+      },
+    }).select("placeId -_id");
+
+    const newRestaurant = new Restaurant({
+      name: name,
+      address: address,
+      phone: phone,
+      type: type,
+      category: category,
+      rating: rating,
+      description: description,
+      price: price,
+      owner: req.user._id,
+    });
+    newRestaurant.location = { lng: Number(lng), lat: Number(lat) };
+    newRestaurant.placeId = newRestaurant._id;
+    const nearbyPlacesIds = [];
+    for (let i = 0; i < nearbyPlaces.length; i++) {
+      if (nearbyPlaces.length > 5 && i < 5) {
+        nearbyPlacesIds.push(Number(nearbyPlaces[i].placeId));
+      }
+    }
+    newRestaurant.nearbyPlacesIds = nearbyPlacesIds;
+    if (facebook) {
+      newRestaurant.facebook = facebook;
+    }
+    if (website) {
+      newRestaurant.website = website;
+    }
+    newRestaurant.link = `https://boris-labianca-happycow.netlify.app/shop/${newRestaurant._id}`;
+    if (req.files.pictures) {
+      const arrayOfpicturesUrl = [];
+      if (req.files.pictures.length === undefined) {
+        let result = await cloudinary.uploader.upload(
+          convertToBase64(req.files.pictures),
+          {
+            folder: `/happycow/shop/${newRestaurant._id}`,
+          }
+        );
+        // console.log(result);
+        // arrayOfpicturesUrl.push(result.secure_url);
+        newRestaurant.thumbnail = result.secure_url;
+      } else if (req.files.pictures.length > 1) {
+        for (let i = 0; i < req.files.pictures.length; i++) {
+          if (i === 0) {
+            let result = await cloudinary.uploader.upload(
+              convertToBase64(req.files.pictures[i]),
+              {
+                folder: `/happycow/shop/${newRestaurant._id}`,
+              }
+            );
+            newRestaurant.thumbnail = result.secure_url;
+          } else {
+            let result = await cloudinary.uploader.upload(
+              convertToBase64(req.files.pictures[i]),
+              {
+                folder: `/happycow/shop/${newRestaurant._id}`,
+              }
+            );
+            // console.log(req.files.pictures[1]);
+            arrayOfpicturesUrl.push(result.secure_url);
+            newRestaurant.pictures.push(result.secure_url);
+          }
+        }
+      }
+    }
+    // console.log(newRestaurant);
+    await newRestaurant.save();
+    res.json(newRestaurant);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }

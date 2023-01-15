@@ -82,9 +82,9 @@ router.post("/add", isAuthenticated, fileUpload(), async (req, res) => {
     const nearbyPlacesIds = [];
     for (let i = 0; i < nearbyPlaces.length; i++) {
       if (nearbyPlaces.length > 5 && i < 5) {
-        nearbyPlacesIds.push(Number(nearbyPlaces[i].placeId));
+        nearbyPlacesIds.push(nearbyPlaces[i].placeId);
       } else if (nearbyPlaces.length > 0 && nearbyPlaces.length <= 5) {
-        nearbyPlacesIds.push(Number(nearbyPlaces[i].placeId));
+        nearbyPlacesIds.push(nearbyPlaces[i].placeId);
       }
     }
     newRestaurant.nearbyPlacesIds = nearbyPlacesIds;

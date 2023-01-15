@@ -83,7 +83,7 @@ router.post("/add", isAuthenticated, fileUpload(), async (req, res) => {
     for (let i = 0; i < nearbyPlaces.length; i++) {
       if (nearbyPlaces.length > 5 && i < 5) {
         nearbyPlacesIds.push(Number(nearbyPlaces[i].placeId));
-      } else if (nearbyPlaces.length > 0) {
+      } else if (nearbyPlaces.length > 0 && nearbyPlaces.length <= 5) {
         nearbyPlacesIds.push(Number(nearbyPlaces[i].placeId));
       }
     }

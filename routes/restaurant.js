@@ -62,7 +62,7 @@ router.post("/add", isAuthenticated, fileUpload(), async (req, res) => {
     const nearbyPlaces = await Restaurant.find({
       location: {
         $near: [Number(lng), Number(lat)],
-        $maxDistance: 0.003,
+        $maxDistance: 0.05,
       },
     }).select("placeId -_id");
 

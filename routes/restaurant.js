@@ -148,7 +148,9 @@ router.post(
       // console.log(req.files.length);
       const { title, review, rating, pros, cons, placeId } = req.body;
       // console.log(req.files);
-      const shopToReview = await Restaurant.findById(placeId);
+      const shopToReview = await Restaurant.findById(placeId).populate(
+        "reviews"
+      );
       const reviewer = await User.findById(req.user._id).select(
         "-hash -salt -email -token"
       );
@@ -210,11 +212,20 @@ router.post(
       // console.log(shopToReview);
       reviewer.reviews.push(newReview);
       shopToReview.reviews.push(newReview);
-      newReview.date = reviewDate;
+      newReview.date = 0;
+      // console.log(shopToReview.reviews);
+      let totalRating = 0;
+      for (let i = 0; i < shopToReview.reviews.length; i++) {
+        totalRating =
+          Number(totalRating) + Number(shopToReview.reviews[i].rating);
+      }
+
+      shopToReview.rating = (
+        Number(totalRating) / shopToReview.reviews.length
+      ).toFixed(1);
       await newReview.save();
       await reviewer.save();
       await shopToReview.save();
-
       res.status(200).json({ newReview, reviewer, shopToReview });
     } catch (error) {
       res.status(400).json({ message: error.message });

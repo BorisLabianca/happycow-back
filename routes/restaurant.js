@@ -212,7 +212,7 @@ router.post(
       // console.log(shopToReview);
       reviewer.reviews.push(newReview);
       shopToReview.reviews.push(newReview);
-      newReview.date = 0;
+      newReview.date = reviewDate;
       // console.log(shopToReview.reviews);
       let totalRating = 0;
       for (let i = 0; i < shopToReview.reviews.length; i++) {
@@ -228,6 +228,53 @@ router.post(
       await shopToReview.save();
       res.status(200).json({ newReview, reviewer, shopToReview });
     } catch (error) {
+      res.status(400).json({ message: error.message });
+    }
+  }
+);
+
+router.post(
+  "/shop/add-pictures",
+  isAuthenticated,
+  fileUpload(),
+  async (req, res) => {
+    try {
+      // console.log(req.files);
+      const { placeId } = req.body;
+      const shopToAddPicturesTo = await Restaurant.findById(placeId);
+      let message = "";
+      if (!req.files || !placeId) {
+        return res.status(400).json({ message: "Missing parameters." });
+      }
+      const arrayOfPhotosUrl = [];
+      if (req.files.photos.length === undefined) {
+        let result = await cloudinary.uploader.upload(
+          convertToBase64(req.files.photos),
+          {
+            folder: `/happycow/shop/${placeId}`,
+          }
+        );
+        // console.log(result);
+        arrayOfPhotosUrl.push(result.secure_url);
+        shopToAddPicturesTo.pictures.push(result.secure_url);
+        message = "Picture added";
+      } else if (req.files.photos.length > 1) {
+        for (let i = 0; i < req.files.photos.length; i++) {
+          let result = await cloudinary.uploader.upload(
+            convertToBase64(req.files.photos[i]),
+            {
+              folder: `/happycow/shop/${placeId}`,
+            }
+          );
+          // console.log(req.files.photos[1]);
+          arrayOfPhotosUrl.push(result.secure_url);
+          shopToAddPicturesTo.pictures.push(result.secure_url);
+        }
+        message = "Pictures added";
+      }
+      await shopToAddPicturesTo.save();
+      res.status(200).json({ message: message });
+    } catch {
       res.status(400).json({ message: error.message });
     }
   }

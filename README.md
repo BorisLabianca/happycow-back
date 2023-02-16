@@ -18,3 +18,5 @@
 - Authentication
 - MongoDB database
 - Pictures stored on Cloudinary
+- Use MongodBD methods to find nearby businesses
+- Rating update on reviews added to database

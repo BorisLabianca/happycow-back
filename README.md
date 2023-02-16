@@ -1,4 +1,4 @@
-# happycow-back
+# HappyCow Back
 
 <img width="1727" alt="Capture d’écran" src="https://user-images.githubusercontent.com/114598539/219403145-f9901f80-7d08-4d6a-8112-8bf670b7ca7d.gif">
 
